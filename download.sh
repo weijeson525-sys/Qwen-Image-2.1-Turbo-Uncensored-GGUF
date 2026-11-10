@@ -7,6 +7,12 @@
 #   ./download.sh --list         # list all available quants and sizes
 #   ./download.sh --mmproj       # download mmproj file(s) only
 set -euo pipefail
+# Reject unexpected extra arguments: a stray extra arg must never start a download.
+if [ "$#" -gt 1 ]; then
+  echo "ERROR: too many arguments (expected at most 1). Usage: ./download.sh [QUANT|--list|--mmproj|--help]" >&2
+  exit 1
+fi
+
 
 HF_REPO="AtomicChat/Qwen-Image-2.1-Turbo-Uncensored-GGUF"
 BASE="https://huggingface.co/$HF_REPO/resolve/main"
@@ -40,6 +46,13 @@ files_for() {
   esac
 }
 
+if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
+  echo "Usage: ./download.sh [QUANT]"
+  echo "       ./download.sh --list        list all available quants and sizes"
+  echo "       ./download.sh --mmproj      download the mmproj vision file only"
+  echo "Default QUANT: $DEFAULT_QUANT"
+  exit 0
+fi
 if [ "${1:-}" = "--list" ]; then list_quants; exit 0; fi
 if [ "${1:-}" = "--mmproj" ]; then
   WANT="mmproj-Qwen-Image-2.1-Turbo-Uncensored-BF16.gguf|1162568928|5cc50e36ab57d7467e7016113525cc699e4c34c3eff7cd7b98d2ecfdba8ab720 mmproj-Qwen-Image-2.1-Turbo-Uncensored-F16.gguf|1159029984|d9870a1f168db3d814596216aaf35702154147b443572c7939acca1802621ac6"
